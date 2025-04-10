@@ -1,0 +1,54 @@
+/* Add Student Button */
+.add-student-btn {
+    background: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.add-student-btn:hover {
+    background: #218838;
+}
+
+/* Student Table */
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.student-table th, .student-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.student-table th {
+    background: #007bff;
+    color: white;
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 15px;
+}
+
+.pagination a {
+    text-decoration: none;
+    padding: 8px 12px;
+    margin: 0 3px;
+    background: #007bff;
+    color: white;
+    border-radius: 4px;
+}
+
+.pagination a.active {
+    background: #0056b3;
+}
+
+.pagination a:hover {
+    background: #0056b3;
+}

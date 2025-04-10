@@ -1,0 +1,180 @@
+2025-04-05 13:51:28 - Request Method: POST
+2025-04-05 13:51:28 - POST data: Array
+(
+    [action] => add_cheque
+    [cheque_year] => Array
+        (
+            [0] => 2025
+        )
+
+    [cheque_month] => Array
+        (
+            [0] => 4
+        )
+
+    [cheque_given_date] => Array
+        (
+            [0] => 2025-04-05
+        )
+
+    [bank_name] => Array
+        (
+            [0] => SBI 
+        )
+
+    [cheque_number] => Array
+        (
+            [0] => 001
+        )
+
+    [cheque_amount] => Array
+        (
+            [0] => 50000
+        )
+
+    [cheque_handover_teacher] => Array
+        (
+            [0] => 3
+        )
+
+    [status] => Array
+        (
+            [0] => pending
+        )
+
+)
+
+2025-04-05 13:51:28 - FILES data: Array
+(
+    [cheque_photo] => Array
+        (
+            [name] => Array
+                (
+                    [0] => ryan-porter-_Xd9VOgoVeY-unsplash.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => ryan-porter-_Xd9VOgoVeY-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php7BBA.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 2445084
+                )
+
+        )
+
+)
+
+2025-04-05 13:51:28 - Action: add_cheque
+2025-04-05 13:51:28 - Processing 1 cheque entries
+2025-04-05 13:51:28 - Processing entry #0
+2025-04-05 13:51:28 - Uploading file: ryan-porter-_Xd9VOgoVeY-unsplash.jpg to assets/images/1743853888_ryan-porter-_Xd9VOgoVeY-unsplash.jpg
+2025-04-05 13:51:28 - Database insert successful for entry #0
+2025-04-05 13:51:28 - All operations completed successfully
+2025-04-05 14:49:06 - Request Method: POST
+2025-04-05 14:49:06 - POST data: Array
+(
+    [action] => add_cheque
+    [cheque_year] => Array
+        (
+            [0] => 2025
+        )
+
+    [cheque_month] => Array
+        (
+            [0] => 3
+        )
+
+    [cheque_given_date] => Array
+        (
+            [0] => 2025-04-05
+        )
+
+    [bank_name] => Array
+        (
+            [0] => SBI Kaij
+        )
+
+    [cheque_number] => Array
+        (
+            [0] => 002
+        )
+
+    [cheque_amount] => Array
+        (
+            [0] => 46000
+        )
+
+    [cheque_handover_teacher] => Array
+        (
+            [0] => 3
+        )
+
+    [status] => Array
+        (
+            [0] => pending
+        )
+
+)
+
+2025-04-05 14:49:06 - FILES data: Array
+(
+    [cheque_photo] => Array
+        (
+            [name] => Array
+                (
+                    [0] => omid-armin-gSZCLsE7ysc-unsplash.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => omid-armin-gSZCLsE7ysc-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php3F2E.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 1441102
+                )
+
+        )
+
+)
+
+2025-04-05 14:49:06 - Action: add_cheque
+2025-04-05 14:49:06 - Processing 1 cheque entries
+2025-04-05 14:49:06 - Processing entry #0
+2025-04-05 14:49:06 - Uploading file: omid-armin-gSZCLsE7ysc-unsplash.jpg to assets/images/1743857346_omid-armin-gSZCLsE7ysc-unsplash.jpg
+2025-04-05 14:49:06 - Database insert successful for entry #0
+2025-04-05 14:49:06 - All operations completed successfully

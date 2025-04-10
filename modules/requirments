@@ -1,0 +1,127 @@
+Create a Web app for student managment system the app name should be Maktab-a-ekra with below features.
+1) Create Admin login with full access, teacher login with there only visible student which is under them.
+2) Montly fees collection per student(fees should be dynamica)
+3) Create a dashboard with overall fees collected for the year and overall fees collected for the single student for the year inside student info, pending fees for the year.
+4) All the student information with Photo.
+5) Send sms on the number if any student fees received and pending fees for the month and pending fees for the year.
+Use below stack: PHP , jQuery, css,mysql
+
+Add more additinal feature if you think it will required.
+
+
+Create a sidebar menu Meeting Details which list of meeting of all month with search functionality of month and yers and provide view option to view complete meeting details and provide add meeting details page as well with below fields.
+1) Student chodne ki jimmedari.(teacher role dropdown from users)
+2) Namaz ki jemmedari. (teacher role dropdown from users)
+3) daily visits. (Dropdown from users table which have role admin)
+	1) After fajar visit.
+	2) After Asar visit
+	3) After Magrib visit.
+4) fees collection of commiti
+5) Maktab lock (teacher role dropdown from users)
+6) Safai aur akhlak (teacher role dropdown from users)
+7) Khana. (Dropdown from users table which have role admin)
+
+create table schema as well of meeting details and make the page as you provides previsous pages.
+
+1) Maintanance
+	1) Maktab Rest
+	2) Maktab Safai
+	3) Water
+	4) misselinious (i able to add multiple entry. provide add more button to add multiple entries.)
+	Status : Done
+2) Salary
+	1) check Number
+	2) amount
+	3) Photo
+	4) given to
+	5) Date.
+3) ulma wise collected percentage (admin)
+	1) total amount
+	2) collected
+	3) pending
+	4) Percentage.
+4) Approval system
+	1) if entry maid by any teacher then it should go for approval to Sadar sab.
+	2) Once sadar approve the payment then it will reflact into collected amount.
+	3) 
+5) SMS to parents SMS
+
+6) student address
+	remove studnent section.
+
+
+
+history_table-students
+
+1) studnent_id
+2) Years
+3) active
+4) fees
+5) konsa ulma
+
+Whats app msg
+
+
+<a href="https://wa.me/919876543210?text=Hello!%20I%20need%20assistance." target="_blank">
+    Message on WhatsApp
+</a>
+
+
+ Clean up and refactor the code  
+ Improve database security (prepared statements)  
+ Optimize performance (minify CSS/JS, query improvements)  
+ Enhance security (password hashing, input validation)  
+
+CREATE TABLE student_status_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    year INT NOT NULL,
+    month int not null,
+    assigned_teacher INT NOT NULL,
+    salana_fees DECIMAL(10,2) NOT NULL,
+    status ENUM('active', 'inactive', 'transferred', 'graduated') NOT NULL DEFAULT 'active',
+    current_active_record tinyint,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by int
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by int
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (assigned_teacher) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE cheque_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cheque_given_date DATE NOT NULL,
+    cheque_year INT NOT NULL,
+    cheque_month INT NOT NULL,
+    cheque_number VARCHAR(100) NOT NULL,
+    cheque_amount DECIMAL(10,2) NOT NULL,
+    cheque_photo VARCHAR(255) NOT NULL,
+    cheque_handover_teacher int(11) NOT NULL,
+    is_deleted TINYINT(1) DEFAULT 0,
+    created_by INT NOT NULL,
+    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_by INT DEFAULT NULL,
+    deleted_on TIMESTAMP NULL DEFAULT NULL
+);
+
+function updateStudentStatusHistory($conn, $student_id, $year, $assigned_teacher, $salana_fees, $status = 'active') {
+    // Step 1: Mark previous record as inactive (if any)
+    $updateQuery = "UPDATE student_status_history 
+                    SET current_active_record = 1 
+                    WHERE student_id = ? AND current_active_record = 0";
+    
+    $updateStmt = $conn->prepare($updateQuery);
+    $updateStmt->bind_param("i", $student_id);
+    $updateStmt->execute();
+    $updateStmt->close();
+
+    // Step 2: Insert new entry into student_status_history
+    $insertQuery = "INSERT INTO student_status_history (student_id, year, assigned_teacher, salana_fees, status, current_active_record)
+                    VALUES (?, ?, ?, ?, ?, 0)";
+    
+    $insertStmt = $conn->prepare($insertQuery);
+    $insertStmt->bind_param("iiids", $student_id, $year, $assigned_teacher, $salana_fees, $status);
+    $insertStmt->execute();
+    $insertStmt->close();
+}
