@@ -1,5 +1,10 @@
 <?php
+
+header('Content-Type: application/json');
+ob_clean(); // Clean any previous output buffer
+
 require_once '../config.php';
+require_once __DIR__ . '/../../config/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     sendError('Method not allowed', 405);
@@ -7,7 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Get POST data
 $data = json_decode(file_get_contents('php://input'), true);
-
 if (!isset($data['username']) || !isset($data['password'])) {
     sendError('Username and password are required');
 }
@@ -44,11 +48,15 @@ $updateStmt->execute();
 
 // Prepare response
 $response = [
+    'success'=>true,
+    'message'=>"",
     'token' => $token,
-    'userId' => $user['id'],
-    'userType' => $user['user_type'],
-    'name' => $user['name'],
-    'email' => $user['email']
+    'userData' => [
+        'id' => $user['id'],
+        'name' => $user['name'],
+        'role' => $user['user_type'],
+        'email' => $user['email']
+    ]
 ];
 
 sendResponse($response); 

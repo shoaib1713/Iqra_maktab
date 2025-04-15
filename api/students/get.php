@@ -1,16 +1,55 @@
 <?php
-require_once '../config.php';
+
+// Disable error output - very important to prevent PHP errors from breaking JSON
+error_reporting(0);
+ini_set('display_errors', 0);
+
+// Set proper headers
+header('Content-Type: application/json');
+ob_clean(); // Clean any previous output buffer
+
+// Include dependencies
+try {
+    require_once '../config.php';
+    require_once __DIR__ . '/../../config/db.php';
+} catch (Exception $e) {
+    // If includes fail, return a properly formatted JSON error
+    echo json_encode([
+        'success' => false,
+        'message' => 'Server configuration error',
+        'data' => [
+            'students' => [],
+            'pagination' => [
+                'total' => 0,
+                'page' => 1,
+                'limit' => 10,
+                'totalPages' => 1
+            ]
+        ]
+    ]);
+    exit;
+}
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     sendError('Method not allowed', 405);
 }
 
+// Get bearer token - try both header and query param for flexibility with app
 $token = getBearerToken();
-if (!$token) {
+if (!$token && isset($_GET['token'])) {
+    $token = $_GET['token'];
+}
+
+// For app development, we can make token optional for testing
+// but in production this should be required
+$requireToken = true; // Set to false for development/testing
+
+if ($requireToken && !$token) {
     sendError('No token provided', 401);
 }
 
-if (!validateToken($token)) {
+if ($requireToken && !validateToken($token)) {
     sendError('Invalid token', 401);
 }
 
@@ -21,10 +60,11 @@ if (!isset($_GET['id'])) {
 $studentId = (int)$_GET['id'];
 
 // Get student details
-$sql = "SELECT s.*, c.name as class_name 
-        FROM students s 
-        LEFT JOIN classes c ON s.class_id = c.id 
-        WHERE s.id = ? AND s.is_active = 1";
+$sql = "SELECT s.*, s.class as class_name,
+        u.name as teacher_name
+        FROM students s  
+        LEFT JOIN users u ON s.assigned_teacher = u.id
+        WHERE s.id = ?";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $studentId);
@@ -38,11 +78,10 @@ if ($result->num_rows === 0) {
 $student = $result->fetch_assoc();
 
 // Get student's fee history
-$feeSql = "SELECT f.*, p.name as payment_method 
+$feeSql = "SELECT f.* 
            FROM fees f 
-           LEFT JOIN payment_methods p ON f.payment_method_id = p.id 
            WHERE f.student_id = ? 
-           ORDER BY f.payment_date DESC";
+           ORDER BY f.created_at DESC";
 
 $feeStmt = $conn->prepare($feeSql);
 $feeStmt->bind_param("i", $studentId);
@@ -54,51 +93,49 @@ while ($row = $feeResult->fetch_assoc()) {
     $feeHistory[] = [
         'id' => $row['id'],
         'amount' => (float)$row['amount'],
-        'paymentDate' => $row['payment_date'],
-        'paymentMethod' => $row['payment_method'],
-        'receiptNumber' => $row['receipt_number'],
+        'paymentDate' => $row['created_at'],
+        'paymentMethod' => null,
+        'receiptNumber' => null,
         'notes' => $row['notes']
     ];
 }
 
-// Get student's attendance history
-$attendanceSql = "SELECT a.*, l.name as location 
-                  FROM attendance a 
-                  LEFT JOIN locations l ON a.location_id = l.id 
-                  WHERE a.student_id = ? 
-                  ORDER BY a.date DESC 
-                  LIMIT 30";
+// Calculate pending fees
+$totalFees = $student['annual_fees'] ?? 0;
+$paidFees = 0;
 
-$attendanceStmt = $conn->prepare($attendanceSql);
-$attendanceStmt->bind_param("i", $studentId);
-$attendanceStmt->execute();
-$attendanceResult = $attendanceStmt->get_result();
-
-$attendanceHistory = [];
-while ($row = $attendanceResult->fetch_assoc()) {
-    $attendanceHistory[] = [
-        'id' => $row['id'],
-        'date' => $row['date'],
-        'status' => $row['status'],
-        'location' => $row['location'],
-        'notes' => $row['notes']
-    ];
+foreach ($feeHistory as $fee) {
+    $paidFees += $fee['amount'];
 }
+
+$pendingFees = $totalFees - $paidFees;
+if ($pendingFees < 0) $pendingFees = 0;
 
 $response = [
-    'student' => [
+    'success' => true,
+    'message' => 'Student details retrieved successfully',
+    'data' => [
         'id' => $student['id'],
         'name' => $student['name'],
-        'fatherName' => $student['father_name'],
-        'classId' => $student['class_id'],
-        'className' => $student['class_name'],
-        'rollNumber' => $student['roll_number'],
-        'phone' => $student['phone'],
-        'address' => $student['address'],
-        'isActive' => (bool)$student['is_active']
-    ],
-    'feeHistory' => $feeHistory,
-    'attendanceHistory' => $attendanceHistory
+        'father_name' => $student['father_name'] ?? '',
+        'class_id' => $student['class_id'] ?? null,
+        'class_name' => $student['class_name'] ?? '',
+        'roll_number' => $student['roll_number'] ?? '',
+        'phone' => $student['phone'] ?? '',
+        'address' => $student['address'] ?? '',
+        'is_active' => (bool)($student['is_deleted'] ? false : true),
+        'annual_fees' => (float)($student['annual_fees'] ?? 0),
+        'pending_fees' => (float)$pendingFees,
+        'teacher_id' => $student['assigned_teacher'] ?? null,
+        'teacher_name' => $student['teacher_name'] ?? '',
+        'assigned_teacher' => $student['teacher_name'] ?? '',
+        'photo' => $student['photo'] ?? '',
+        'status' => $student['is_deleted'] ? 'inactive' : 'active',
+        'created_at' => $student['created_at'] ?? '',
+        'updated_at' => $student['updated_at'] ?? '',
+        'deleted_at' => $student['deleted_at'] ?? null,
+        'feeHistory' => $feeHistory
+    ]
 ];
 
 sendResponse($response); 
